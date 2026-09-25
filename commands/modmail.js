@@ -50,7 +50,7 @@ module.exports={
     const [guild,c]=cfgs[0];
     const pending=pendingRef(guild.id,m.author.id);
     const old=await pending.get();
-    const messages=old.exists?old.data().messages||[]:[];
+    const messages=old.exists?(old.data().messages||[]):[];
     messages.push({content:m.content,attachments:[...m.attachments.values()].map(a=>a.url),timestamp:new Date().toISOString()});
     await pending.set({messages},{merge:true});
     await m.reply({components:[card(c,EMOJIS.MESSAGE+" Support ModMail","Welcome to **"+c.branding.name+"**.\n\nPlease choose the category that best matches your request.\n\nYour message will be saved until a support ticket is created.","ModMail",COLORS.SKY_BLUE),buttons()],flags:MessageFlags.IsComponentsV2}).catch(()=>{});
@@ -74,7 +74,7 @@ module.exports={
    try{
     const c=await getGuildConfig(i.guildId),existing=await findOpen(i.guildId,i.user.id);
     if(existing)return i.reply({content:"You already have an open ModMail ticket: <#"+existing.data().channelId+">",ephemeral:true});
-    const pending=await pendingRef(i.guildId,i.user.id).get(),msgs=pending.exists?pending.data().messages||[];
+    const pending=await pendingRef(i.guildId,i.user.id).get(),msgs=pending.exists?(pending.data().messages||[]):[];
     const n=Date.now().toString().slice(-6);
     const ch=await i.guild.channels.create({name:"modmail-"+key+"-"+n,type:ChannelType.GuildText,permissionOverwrites:[
      {id:i.guild.roles.everyone.id,deny:[PermissionFlagsBits.ViewChannel]},
