@@ -5,7 +5,7 @@ const {initializeGuild,getGuildConfig}=require("./lib/guildConfig");
 const warningCommand=require("./commands/warnings");
 const moderationCommand=require("./commands/moderation");
 const afkCommand=require("./commands/afk");
-const ticketCommand=require("./commands/ticket");
+const modmailCommand=require("./commands/modmail");
 const noPrefixCommand=require("./commands/noPrefix");
 
 const commands=[require("./commands/ping"),require("./commands/help"),require("./commands/config"),warningCommand,moderationCommand,afkCommand,noPrefixCommand];
