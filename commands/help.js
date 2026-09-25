@@ -1,0 +1,2 @@
+const {SlashCommandBuilder}=require("discord.js");const {card}=require("../lib/ui");
+module.exports={data:new SlashCommandBuilder().setName("help").setDescription("Show available commands."),async execute(i,c){return i.reply(card(c,"Help",["**Commands**","/ping — Check latency","/help — Show this help","/config — Configure this server","","Prefix: `"+c.prefix+"`"].join("\n")));}};
