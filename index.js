@@ -7,6 +7,7 @@ const moderationCommand=require("./commands/moderation");
 const afkCommand=require("./commands/afk");
 const modmailCommand=require("./commands/modmail");
 const voiceCommand=require("./commands/voice");
+const miscCommand=require("./commands/misc");
 const noPrefixCommand=require("./commands/noPrefix");
 
 const commands=[require("./commands/ping"),require("./commands/help"),require("./commands/config"),warningCommand,moderationCommand,afkCommand,noPrefixCommand,modmailCommand,voiceCommand];
@@ -28,6 +29,7 @@ afkCommand.register(client);
 noPrefixCommand.register(client);
 modmailCommand.register(client);
 voiceCommand.register(client);
+miscCommand.register(client);
 const app=express();
 app.get("/",(q,s)=>s.status(200).send("Community Bot is online."));
 app.get("/health",(q,s)=>s.json({ok:true,bot:client.isReady(),guilds:client.guilds.cache.size}));
