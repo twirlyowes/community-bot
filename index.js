@@ -8,7 +8,7 @@ const afkCommand=require("./commands/afk");
 const modmailCommand=require("./commands/modmail");
 const noPrefixCommand=require("./commands/noPrefix");
 
-const commands=[require("./commands/ping"),require("./commands/help"),require("./commands/config"),warningCommand,moderationCommand,afkCommand,noPrefixCommand];
+const commands=[require("./commands/ping"),require("./commands/help"),require("./commands/config"),warningCommand,moderationCommand,afkCommand,noPrefixCommand,modmailCommand];
 const token=process.env.DISCORD_TOKEN;if(!token)throw new Error("Missing DISCORD_TOKEN.");
 const client=new Client({intents:[GatewayIntentBits.Guilds,GatewayIntentBits.GuildMessages,GatewayIntentBits.MessageContent]});
 client.commands=new Collection(commands.map(c=>[c.data.name,c]));
@@ -25,6 +25,7 @@ client.on(Events.InteractionCreate,async i=>{
 });
 afkCommand.register(client);
 noPrefixCommand.register(client);
+modmailCommand.register(client);
 const app=express();
 app.get("/",(q,s)=>s.status(200).send("Community Bot is online."));
 app.get("/health",(q,s)=>s.json({ok:true,bot:client.isReady(),guilds:client.guilds.cache.size}));

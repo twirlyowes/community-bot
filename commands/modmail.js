@@ -7,6 +7,7 @@ const tickets=db.collection("guilds");
 const ticketRef=(g,c)=>tickets.doc(g).collection("modmail").doc(c);
 const pendingRef=(g,u)=>tickets.doc(g).collection("modmailPending").doc(u);
 const categories={minecraft:"Minecraft",discord:"Discord",others:"Others"};
+const data=new (require("discord.js").SlashCommandBuilder)().setName("modmail").setDescription("Manage ModMail tickets.").addSubcommand(s=>s.setName("close").setDescription("Close the ModMail ticket in this channel."));
 
 function buttons(){return new ActionRowBuilder().addComponents(
  new ButtonBuilder().setCustomId("modmail_minecraft").setLabel("Minecraft").setStyle(ButtonStyle.Primary).setEmoji("⛏️"),
@@ -21,7 +22,20 @@ async function sendToTicket(client,g,u,message){
  return true;
 }
 module.exports={
- data:null,
+ data,
+ async execute(i,c){
+  if(i.options.getSubcommand()!=="close")return;
+  const snap=await tickets.doc(i.guildId).collection("modmail").where("channelId","==",i.channelId).where("status","==","open").limit(1).get();
+  if(snap.empty)return i.reply({content:"This channel is not an open ModMail ticket.",ephemeral:true});
+  const d=snap.docs[0].data(),member=i.member,staffRole=c.moderation.staffRoleId;
+  const allowed=member.permissions.has(PermissionFlagsBits.Administrator)||(staffRole&&member.roles.cache.has(staffRole));
+  if(!allowed)return i.reply({content:"You need the configured staff role or Administrator permission.",ephemeral:true});
+  await snap.docs[0].ref.update({status:"closed",closedBy:i.user.id,closedAt:new Date().toISOString()});
+  const u=await client.users.fetch(d.userId).catch(()=>null);
+  if(u)await u.send({components:[card(c,EMOJIS.SUCCESS+" ModMail Closed","Your **"+categories[d.category]+"** support ticket has been closed.\n\nYou can DM the bot again if you need further assistance.","ModMail",COLORS.RED)],flags:MessageFlags.IsComponentsV2}).catch(()=>{});
+  await i.reply(card(c,EMOJIS.SUCCESS+" ModMail Closed","Ticket closed by "+i.user+".\n\nThis channel will be deleted in **5 seconds**.","ModMail",COLORS.RED));
+  setTimeout(()=>i.channel.delete().catch(()=>{}),5000);
+ },
  register(client){
   client.on("messageCreate",async m=>{
    if(m.author.bot||m.channel.type!==ChannelType.DM)return;
