@@ -1,0 +1,13 @@
+require("dotenv").config();
+const express=require("express");
+const {Client,Collection,GatewayIntentBits,REST,Routes,Events}=require("discord.js");
+const {initializeGuild,getGuildConfig}=require("./lib/guildConfig");
+const commands=[require("./commands/ping"),require("./commands/help"),require("./commands/config")];
+const token=process.env.DISCORD_TOKEN;if(!token)throw new Error("Missing DISCORD_TOKEN.");
+const client=new Client({intents:[GatewayIntentBits.Guilds,GatewayIntentBits.GuildMessages,GatewayIntentBits.MessageContent]});
+client.commands=new Collection(commands.map(c=>[c.data.name,c]));
+client.once(Events.ClientReady,async ready=>{console.log("Logged in as "+ready.user.tag);try{const rest=new REST({version:"10"}).setToken(token);await rest.put(Routes.applicationCommands(ready.user.id),{body:commands.map(c=>c.data.toJSON())});console.log("Slash commands registered.");}catch(e){console.error("Slash registration failed:",e);}for(const g of ready.guilds.cache.values())try{await initializeGuild(g.id);}catch(e){console.error("Config failed:",e);}console.log("Serving "+ready.guilds.cache.size+" server(s).");});
+client.on(Events.GuildCreate,g=>initializeGuild(g.id).catch(console.error));
+client.on(Events.InteractionCreate,async i=>{if(!i.isChatInputCommand()||!i.guildId)return;const cmd=client.commands.get(i.commandName);if(!cmd)return;try{await cmd.execute(i,await getGuildConfig(i.guildId));}catch(e){console.error(e);const p={content:"Something went wrong.",ephemeral:true};if(i.replied||i.deferred)await i.followUp(p).catch(()=>{});else await i.reply(p).catch(()=>{});}});
+client.on(Events.MessageCreate,async m=>{if(m.author.bot||!m.guild)return;try{const c=await getGuildConfig(m.guild.id);if(!m.content.startsWith(c.prefix))return;const n=m.content.slice(c.prefix.length).trim().split(/\s+/)[0]?.toLowerCase();const {card}=require("./lib/ui");if(n==="ping")return m.reply(card(c,"Pong!","WebSocket latency: **"+client.ws.ping+"ms**"));if(n==="help")return m.reply(card(c,"Help","`"+c.prefix+"ping` — Check latency\n`"+c.prefix+"help` — Show help"));}catch(e){console.error("Message command failed:",e);}});
+const app=express();app.get("/",(q,s)=>s.status(200).send("Community Bot is online."));app.get("/health",(q,s)=>s.json({ok:true,bot:client.isReady(),guilds:client.guilds.cache.size}));app.listen(Number(process.env.PORT||10000),"0.0.0.0",()=>console.log("Health server listening."));client.login(token);

@@ -1,0 +1,2 @@
+const {SlashCommandBuilder}=require("discord.js");const {card}=require("../lib/ui");
+module.exports={data:new SlashCommandBuilder().setName("ping").setDescription("Check the bot latency."),async execute(i,c){return i.reply(card(c,"Pong!","WebSocket latency: **"+i.client.ws.ping+"ms**"));}};
