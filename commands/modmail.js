@@ -31,7 +31,7 @@ module.exports={
   const allowed=member.permissions.has(PermissionFlagsBits.Administrator)||(staffRole&&member.roles.cache.has(staffRole));
   if(!allowed)return i.reply({content:"You need the configured staff role or Administrator permission.",ephemeral:true});
   await snap.docs[0].ref.update({status:"closed",closedBy:i.user.id,closedAt:new Date().toISOString()});
-  const u=await client.users.fetch(d.userId).catch(()=>null);
+  const u=await i.client.users.fetch(d.userId).catch(()=>null);
   if(u)await u.send({components:[card(c,EMOJIS.SUCCESS+" ModMail Closed","Your **"+categories[d.category]+"** support ticket has been closed.\n\nYou can DM the bot again if you need further assistance.","ModMail",COLORS.RED)],flags:MessageFlags.IsComponentsV2}).catch(()=>{});
   await i.reply(card(c,EMOJIS.SUCCESS+" ModMail Closed","Ticket closed by "+i.user+".\n\nThis channel will be deleted in **5 seconds**.","ModMail",COLORS.RED));
   setTimeout(()=>i.channel.delete().catch(()=>{}),5000);
@@ -74,7 +74,7 @@ module.exports={
    try{
     const c=await getGuildConfig(i.guildId),existing=await findOpen(i.guildId,i.user.id);
     if(existing)return i.reply({content:"You already have an open ModMail ticket: <#"+existing.data().channelId+">",ephemeral:true});
-    const pending=await pendingRef(i.guildId,i.user.id).get(),msgs=pending.exists?pending.data().messages||():[];
+    const pending=await pendingRef(i.guildId,i.user.id).get(),msgs=pending.exists?pending.data().messages||[];
     const n=Date.now().toString().slice(-6);
     const ch=await i.guild.channels.create({name:"modmail-"+key+"-"+n,type:ChannelType.GuildText,permissionOverwrites:[
      {id:i.guild.roles.everyone.id,deny:[PermissionFlagsBits.ViewChannel]},
