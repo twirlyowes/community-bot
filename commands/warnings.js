@@ -2,6 +2,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const { db } = require("../firebase");
 const { COLORS, EMOJIS, card, getAvatarURL } = require("../lib/ui");
 const { getGuildConfig } = require("../lib/guildConfig");
+const { db: firebaseDb } = require("../firebase");
 
 const MAX_WARNINGS = 5;
 
