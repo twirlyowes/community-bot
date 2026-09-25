@@ -8,7 +8,7 @@ const MAX_WARNINGS = 5;
 
 function explicitMention(message,args){
   if(!args[0]) return null;
-  const match=args[0].match(/^<@!?(d+)>$/);
+  const match=args[0].match(/^<@!?(\d+)>$/);
   return match ? message.mentions.members.get(match[1]) || null : null;
 }
 
