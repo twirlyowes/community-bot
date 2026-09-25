@@ -6,11 +6,12 @@ const warningCommand=require("./commands/warnings");
 const moderationCommand=require("./commands/moderation");
 const afkCommand=require("./commands/afk");
 const modmailCommand=require("./commands/modmail");
+const voiceCommand=require("./commands/voice");
 const noPrefixCommand=require("./commands/noPrefix");
 
-const commands=[require("./commands/ping"),require("./commands/help"),require("./commands/config"),warningCommand,moderationCommand,afkCommand,noPrefixCommand,modmailCommand];
+const commands=[require("./commands/ping"),require("./commands/help"),require("./commands/config"),warningCommand,moderationCommand,afkCommand,noPrefixCommand,modmailCommand,voiceCommand];
 const token=process.env.DISCORD_TOKEN;if(!token)throw new Error("Missing DISCORD_TOKEN.");
-const client=new Client({intents:[GatewayIntentBits.Guilds,GatewayIntentBits.GuildMessages,GatewayIntentBits.MessageContent]});
+const client=new Client({intents:[GatewayIntentBits.Guilds,GatewayIntentBits.GuildMessages,GatewayIntentBits.MessageContent,GatewayIntentBits.GuildVoiceStates,GatewayIntentBits.GuildMembers]});
 client.commands=new Collection(commands.map(c=>[c.data.name,c]));
 client.once(Events.ClientReady,async ready=>{
  console.log("Logged in as "+ready.user.tag);
@@ -26,6 +27,7 @@ client.on(Events.InteractionCreate,async i=>{
 afkCommand.register(client);
 noPrefixCommand.register(client);
 modmailCommand.register(client);
+voiceCommand.register(client);
 const app=express();
 app.get("/",(q,s)=>s.status(200).send("Community Bot is online."));
 app.get("/health",(q,s)=>s.json({ok:true,bot:client.isReady(),guilds:client.guilds.cache.size}));
