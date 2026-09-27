@@ -1,5 +1,4 @@
 const {PermissionsBitField,MessageFlags,ContainerBuilder,TextDisplayBuilder,SectionBuilder,ThumbnailBuilder,MediaGalleryBuilder,MediaGalleryItemBuilder}=require("discord.js");
-const axios=require("axios");
 const {db}=require("../firebase");
 const {getGuildConfig}=require("../lib/guildConfig");
 const {card,COLORS,EMOJIS}=require("../lib/ui");
